@@ -3,7 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 
 const { BookingRepository } = require("../repositories");
 const AppError = require("../utils/errors/app-error");
-const { ServerConfig } = require("../config");
+const { ServerConfig, Queue } = require("../config");
 const db = require("../models");
 const { Enums } = require("../utils/common");
 const { BOOKED, CANCELED } = Enums.BOOKING_STATUS;
@@ -89,6 +89,14 @@ async function makePayment(data) {
       { status: BOOKED },
       transaction
     );
+
+    // After the payment is successful, we can send a notification to the user
+    Queue.sendData({
+      recepientEmail: "d.e.vo.nm.e.ndoza60@gmail.com",
+      subject: "Flight Booked",
+      text: `Booking Successfully Done for The Booking Id ${data.bookingId}`,
+    });
+
     await transaction.commit();
   } catch (error) {
     await transaction.rollback();
