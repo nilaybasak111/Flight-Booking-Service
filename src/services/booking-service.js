@@ -90,9 +90,14 @@ async function makePayment(data) {
       transaction
     );
 
+    // Finding User Mail Id using UserId
+    const userMail = await axios.get(`${ServerConfig.API_GATEWAY_BOOKING}/api/v1/user/${data.userId}`);
+    //console.log("this is user mail from booking service ", userMail.data.data);
+
     // After the payment is successful, we can send a notification to the user
     Queue.sendData({
-      recepientEmail: "d.e.vo.nm.e.ndoza60@gmail.com",
+      // recepientEmail: "abc@gmail.com",
+      recepientEmail: userMail.data.data,
       subject: "Flight Booked",
       text: `Booking Successfully Done for The Booking Id ${data.bookingId}`,
     });
